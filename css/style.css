@@ -1,0 +1,805 @@
+/* ============================================================
+   FALSE MEMORY — Mobile CSS
+   Minimalist thriller / monochrome dread aesthetic
+   ============================================================ */
+
+/* ── Reset & Base ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  color: #c8c8c8;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Three.js Canvas ──────────────────────────────────────── */
+canvas {
+  position: fixed;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  z-index: 1;
+}
+
+/* ── Utility ──────────────────────────────────────────────── */
+.hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease;
+}
+
+/* ── Fullscreen Overlay Screens ───────────────────────────── */
+#start-screen,
+#settings-screen,
+#gameover-screen,
+#win-screen,
+#credits-screen,
+#mirror-ending-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  padding: 32px 24px;
+  transition: opacity 0.4s ease;
+}
+
+#gameover-screen {
+  z-index: 30; /* выше всего остального, включая flash-screen */
+  background: rgba(10, 0, 0, 0.92);
+}
+
+/* Screen title */
+#start-screen h1,
+#settings-screen h2,
+#gameover-screen h2 {
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(22px, 6vw, 34px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #e8e8e8;
+  text-shadow:
+    0 0 8px rgba(255, 40, 40, 0.35),
+    0 0 24px rgba(255, 0, 0, 0.12);
+  text-align: center;
+}
+
+.gameover-title {
+  color: #ff5555 !important;
+  text-shadow:
+    0 0 10px rgba(255, 0, 0, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.25) !important;
+}
+
+/* Subtitle / tagline */
+#start-screen p,
+#settings-screen p,
+#gameover-screen p {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #555;
+  text-align: center;
+  max-width: 320px;
+}
+
+/* ── Settings panel ───────────────────────────────────────── */
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.settings-title {
+  margin-bottom: 4px;
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.setting-row label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #888;
+}
+
+.setting-row input[type="range"] {
+  width: 100%;
+  height: 2px;
+  background: #3a3a3a;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.setting-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #c8c8c8;
+  border: 1px solid #ff3333;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.setting-row input[type="range"]::-webkit-slider-thumb:active {
+  background: #ff3333;
+}
+
+.setting-row input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #c8c8c8;
+  border: 1px solid #ff3333;
+  cursor: pointer;
+}
+
+/* ── Graphics quality select (тени и т.п.) ───────────────────── */
+.select-graphics {
+  width: 100%;
+  padding: 9px 10px;
+  background: #1c1c1c;
+  color: #d8d8d8;
+  border: 1px solid #3a3a3a;
+  border-radius: 3px;
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M0 0l5 6 5-6z' fill='%23888'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.2s ease;
+}
+
+.select-graphics:hover,
+.select-graphics:focus {
+  border-color: #ff3333;
+  outline: none;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+  padding: 12px 24px;
+  background: transparent;
+  color: #c8c8c8;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border: 1px solid #3a3a3a;
+  border-radius: 0;
+  cursor: pointer;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn:hover {
+  border-color: #666;
+  color: #fff;
+}
+
+.btn:active {
+  background: rgba(255, 51, 51, 0.08);
+  border-color: #ff3333;
+  color: #ff3333;
+  transition: none;
+}
+
+/* Danger / primary variant */
+.btn--danger {
+  border-color: #5a0000;
+  color: #cc2222;
+}
+
+.btn--danger:hover {
+  border-color: #ff3333;
+  color: #ff5555;
+}
+
+.btn--danger:active {
+  background: rgba(255, 0, 0, 0.15);
+  border-color: #ff0000;
+  color: #fff;
+}
+
+/* ── Game HUD Layer ───────────────────────────────────────── */
+#game-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none; /* let clicks fall through to canvas by default */
+}
+
+/* Settings gear — top right */
+#btn-settings-open {
+  position: absolute;
+  top: 16px;
+  right: 64px; /* сдвинуто влево, чтобы освободить место для кнопки fullscreen */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid #2a2a2a;
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: all;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  font-size: 18px;
+  color: #888;
+}
+
+#btn-settings-open:active {
+  background: rgba(255, 51, 51, 0.12);
+  border-color: #ff3333;
+  color: #ff3333;
+  transition: none;
+}
+
+/* Fullscreen button — top right corner */
+#btn-fullscreen {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid #2a2a2a;
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: all;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  color: #888;
+}
+
+#btn-fullscreen:active {
+  background: rgba(255, 51, 51, 0.12);
+  border-color: #ff3333;
+  color: #ff3333;
+  transition: none;
+}
+
+/* ── Paranoia Meter — top left ────────────────────────────── */
+#paranoia-meter {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.paranoia-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #6a6a6a;
+}
+
+.paranoia-bar-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #2a2a2a;
+  overflow: hidden;
+}
+
+#paranoia-bar-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #882222, #ff3333);
+  box-shadow: 0 0 6px rgba(255, 51, 51, 0.5);
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+/* Warning pulse when paranoia is high */
+#paranoia-meter.critical .paranoia-bar-track {
+  border-color: #ff3333;
+  animation: paranoia-pulse 0.6s ease-in-out infinite;
+}
+
+@keyframes paranoia-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(255, 0, 0, 0.3); }
+  50%      { box-shadow: 0 0 14px rgba(255, 0, 0, 0.8); }
+}
+
+/* ── Touch control hint (fades after first move) ──────────── */
+#touch-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+#touch-hint.fade-out {
+  opacity: 0;
+}
+
+.hint-zone {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 140px;
+}
+
+.hint-zone span {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 14px;
+}
+
+/* Crosshair — dead center */
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+/* Crosshair hair lines */
+.ch-h,
+.ch-v {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 1px;
+}
+
+.ch-h {
+  width: 16px;
+  height: 1px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ch-v {
+  width: 1px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ── Focus / Awareness Button — bottom right ──────────────── */
+#focus-container {
+  position: absolute;
+  bottom: 32px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+/* The round button */
+#btn-focus {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(10, 0, 0, 0.72);
+  border: 1px solid #2a0000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #882222;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+#btn-focus:active {
+  background: rgba(40, 0, 0, 0.9);
+  border-color: #ff3333;
+  color: #ff5555;
+  transition: none;
+}
+
+/* SVG progress ring — layered on top of the button */
+.progress-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  pointer-events: none;
+  width: 80px;
+  height: 80px;
+}
+
+#progress-circle {
+  fill: transparent;
+  stroke: #ff3333;
+  stroke-width: 4;
+  stroke-linecap: round;
+  /* dasharray / dashoffset set via JS; transition for smooth fill */
+  transition: stroke-dashoffset 0.05s linear;
+  filter: drop-shadow(0 0 4px rgba(255, 51, 51, 0.5));
+}
+
+/* ── Flash / Memory Screen ────────────────────────────────── */
+#flash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  /* NO transition here — instant white flash on .active */
+}
+
+#flash-screen.active {
+  opacity: 1;
+  /* Fade out handled by removing .active with a JS timeout;
+     add a fast fade-out transition only on the way back */
+  transition: opacity 0.35s ease-out;
+}
+
+/* ── Скример секретной концовки: полностью белая вспышка на ~1с ── */
+#mirror-scare-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 40; /* выше HUD и виньетки */
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#mirror-scare-flash.active {
+  opacity: 1;
+  transition: opacity 0.05s linear; /* мгновенное появление */
+}
+
+#mirror-scare-flash.fading {
+  opacity: 0;
+  transition: opacity 0.9s ease-out; /* плавное угасание после удержания */
+}
+
+/* ── Screen-shake: применяется на canvas-контейнер ── */
+@keyframes mirror-screen-shake {
+  0%   { transform: translate(0, 0); }
+  10%  { transform: translate(-6px, 4px) rotate(-0.4deg); }
+  20%  { transform: translate(5px, -5px) rotate(0.3deg); }
+  30%  { transform: translate(-4px, 6px) rotate(-0.3deg); }
+  40%  { transform: translate(6px, -3px) rotate(0.4deg); }
+  50%  { transform: translate(-5px, -4px) rotate(-0.2deg); }
+  60%  { transform: translate(4px, 5px) rotate(0.3deg); }
+  70%  { transform: translate(-6px, -2px) rotate(-0.4deg); }
+  80%  { transform: translate(5px, 4px) rotate(0.2deg); }
+  90%  { transform: translate(-3px, -5px) rotate(-0.1deg); }
+  100% { transform: translate(0, 0); }
+}
+
+.mirror-shake {
+  animation: mirror-screen-shake 0.4s linear;
+}
+
+/* ── Ambient Vignette (always on, canvas-overlay) ─────────── */
+#vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    rgba(0, 0, 0, 0.72) 100%
+  );
+  transition: background 0.6s ease-out, opacity 0.6s ease-out;
+}
+
+/* Паранойя растёт → виньетка темнее, ближе к центру и с красноватым краем */
+#vignette.paranoia-mid {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 38%,
+    rgba(20, 2, 2, 0.80) 100%
+  );
+}
+
+#vignette.paranoia-critical {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 28%,
+    rgba(40, 0, 0, 0.88) 100%
+  );
+  animation: vignette-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes vignette-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.82; }
+}
+
+/* ── Responsive Tweaks ────────────────────────────────────── */
+@media (max-width: 380px) {
+  #btn-focus {
+    width: 60px;
+    height: 60px;
+    font-size: 8px;
+  }
+
+  .progress-ring {
+    width: 68px;
+    height: 68px;
+  }
+
+  #focus-container {
+    bottom: 24px;
+    right: 16px;
+  }
+
+  .btn {
+    min-width: 150px;
+    font-size: 12px;
+  }
+
+  #paranoia-meter {
+    width: 110px;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Tablet: shift focus btn further from edge */
+  #focus-container {
+    bottom: 48px;
+    right: 48px;
+  }
+
+  #btn-settings-open {
+    top: 24px;
+    right: 24px;
+  }
+
+  #paranoia-meter {
+    top: 24px;
+    left: 24px;
+  }
+}
+
+/* ── Anomaly Counter ──────────────────────────────────────── */
+#anomaly-counter-wrap {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(200,200,200,0.18);
+  border-radius: 6px;
+  padding: 3px 10px;
+  pointer-events: none;
+}
+
+#anomaly-counter {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #b0a898;
+}
+
+/* ── Noclip restart button (shown in HUD during noclip) ────── */
+#btn-noclip-restart {
+  position: absolute;
+  top: 12px;
+  right: 60px; /* рядом с кнопкой настроек */
+  z-index: 30;
+  font-size: 11px;
+  padding: 6px 12px;
+  min-width: unset;
+  background: rgba(20,20,20,0.75);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  color: #c8c8c8;
+  letter-spacing: 0.08em;
+}
+
+/* ── Win Screen ───────────────────────────────────────────── */
+#win-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.win-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 90%;
+  max-width: 480px;
+}
+
+#win-video-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #111;
+  border: 2px dashed rgba(200,200,200,0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.win-video-label {
+  color: rgba(180,170,160,0.45);
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── Credits Screen ───────────────────────────────────────── */
+#credits-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, #0e0e0e 0%, #000 100%);
+}
+
+.credits-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 88%;
+  max-width: 440px;
+  text-align: center;
+}
+
+.credits-title {
+  font-size: 20px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #d4cec6;
+  font-weight: normal;
+}
+
+.credits-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #9a9488;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.credits-small {
+  font-size: 11px;
+  color: #5a5650;
+  margin-top: 6px;
+}
+
+.credits-buttons {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Btn light variant ────────────────────────────────────── */
+.btn--light {
+  background: transparent;
+  border-color: rgba(200,200,200,0.35);
+  color: #c8c8c8;
+}
+
+.btn--light:active {
+  background: rgba(255,255,255,0.07);
+}
+
+/* ── Noclip overlay banner ────────────────────────────────── */
+#noclip-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.noclip-banner {
+  margin-top: 48px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,200,50,0.3);
+  border-radius: 6px;
+  padding: 5px 16px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #c8b870;
+  text-transform: uppercase;
+}
+
+/* ── Reduced Motion ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  #paranoia-meter.critical .paranoia-bar-track {
+    animation: none !important;
+  }
+}
