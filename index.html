@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>False Memory</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Стартовый экран ── -->
+  <div id="start-screen">
+    <h1 class="game-title">FALSE MEMORY V-74.0</h1>
+    <p class="disclaimer">
+      Эта игра содержит пугающую атмосферу, резкие звуки и зрительные аномалии.
+      Не рекомендуется людям с повышенной тревожностью, эпилепсией или
+      чувствительностью к хоррор-контенту. Играйте осознанно.
+эта игра не предназначена для массового распространения. 
+У этой игры нет оскорбительного или какогото помысла все создано в итогах обучения. 
+    </p>
+    <button id="btn-start" class="btn btn--danger">ЗАБЫТЬ</button>
+  </div>
+
+  <!-- ── Экран настроек ── -->
+  <div id="settings-screen" class="hidden">
+    <div class="settings-panel">
+      <h2 class="settings-title">НАСТРОЙКИ</h2>
+
+      <div class="setting-row">
+        <label for="slider-sens">Чувствительность</label>
+        <input
+          type="range"
+          id="slider-sens"
+          min="1"
+          max="20"
+          step="1"
+          value="10"
+        />
+      </div>
+
+      <div class="setting-row">
+        <label for="slider-volume">ползунок</label>
+        <input
+          type="range"
+          id="slider-volume"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.8"
+        />
+      </div>
+
+      <div class="setting-row">
+        <label for="select-shadows">Качество теней</label>
+        <select id="select-shadows" class="select-graphics">
+          <option value="off">Выключены</option>
+          <option value="low">Низкое</option>
+          <option value="high" selected>Высокое</option>
+        </select>
+      </div>
+
+      <button id="btn-close-settings" class="btn">ЗАКРЫТЬ</button>
+    </div>
+  </div>
+
+  <!-- ── Ambient vignette (всегда поверх canvas) ── -->
+  <div id="vignette" aria-hidden="true"></div>
+
+  <!-- ── Игровой HUD ── -->
+  <div id="game-hud" class="hidden">
+
+    <!-- Кнопка открытия настроек -->
+    <button id="btn-settings-open" aria-label="Настройки">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="3" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M11 1v2M11 19v2M1 11h2M19 11h2M3.22 3.22l1.42 1.42M17.36 17.36l1.42 1.42M3.22 18.78l1.42-1.42M17.36 4.64l1.42-1.42"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <!-- Кнопка полноэкранного режима -->
+    <button id="btn-fullscreen" aria-label="Полный экран">
+      <svg id="icon-expand" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M3 8V3h5M17 8V3h-5M3 12v5h5M17 12v5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <svg id="icon-compress" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style="display:none">
+        <path d="M8 3v5H3M12 3v5h5M8 17v-5H3M12 17v-5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Индикатор паранойи -->
+    <div id="paranoia-meter" aria-hidden="true">
+      <div class="paranoia-label">ПАРАНОЙЯ</div>
+      <div class="paranoia-bar-track">
+        <div id="paranoia-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Счётчик исправленных аномалий -->
+    <div id="anomaly-counter-wrap" aria-hidden="true">
+      <span id="anomaly-counter">0/35</span>
+    </div>
+
+    <!-- Кнопка Перезапустить (ноуклип режим) -->
+    <button id="btn-noclip-restart" class="btn btn--noclip hidden" aria-label="Перезапустить">↺ ПЕРЕЗАПУСТИТЬ</button>
+
+    <!-- Подсказка по управлению (исчезает после первого движения) -->
+    <div id="touch-hint" aria-hidden="true">
+      <div class="hint-zone hint-zone--left">
+        <span>ДВИЖЕНИЕ</span>
+      </div>
+      <div class="hint-zone hint-zone--right">
+        <span>ОБЗОР</span>
+      </div>
+    </div>
+
+    <!-- Прицел -->
+    <div id="crosshair" aria-hidden="true">
+      <span class="ch-h"></span>
+      <span class="ch-v"></span>
+    </div>
+
+    <!-- Кнопка «Осознание» с кольцом прогресса -->
+    <div id="focus-container">
+      <svg class="progress-ring" width="90" height="90" aria-hidden="true">
+        <circle
+          id="progress-circle"
+          cx="45"
+          cy="45"
+          r="36"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-dasharray="226.19"
+          stroke-dashoffset="226.19"
+          stroke-linecap="round"
+          transform="rotate(-90 45 45)"
+        />
+      </svg>
+      <button id="btn-focus">ОСОЗНАНИЕ</button>
+    </div>
+
+  </div>
+
+  <!-- ── Экран белой вспышки ── -->
+  <div id="flash-screen" aria-hidden="true"></div>
+
+  <!-- ── Экран Game Over ── -->
+  <div id="gameover-screen" class="hidden">
+    <h2 class="gameover-title">РЕАЛЬНОСТЬ ПОТЕРЯНА</h2>
+    <p class="gameover-text">
+      Паранойя поглотила тебя. Память больше не отличает правду от лжи.
+    </p>
+    <button id="btn-restart" class="btn btn--danger">НАЧАТЬ СНОВА</button>
+  </div>
+
+  <!-- ── Экран финала (место для видео) ── -->
+  <div id="win-screen" class="hidden">
+    <div class="win-inner">
+      <!-- МЕСТО ДЛЯ ФИНАЛЬНОГО ВИДЕО: вставь сюда <video> тег -->
+      <div id="win-video-placeholder">
+        <p class="win-video-label">[ ФИНАЛЬНОЕ ВИДЕО ]</p>
+      </div>
+      <button id="btn-win-next" class="btn btn--light">ПРОДОЛЖИТЬ</button>
+    </div>
+  </div>
+
+  <!-- ── Экран благодарностей / кредиты ── -->
+  <div id="credits-screen" class="hidden">
+    <div class="credits-inner">
+      <h2 class="credits-title">СПАСИБО ЗА ПРОХОЖДЕНИЕ</h2>
+      <div class="credits-body">
+        <p>Вы исправили <span id="credits-anomaly-count">35</span> аномалий и не застряли в искажённой реальности.</p>
+        <p>Разработка: <strong>UDNMPA TEAM,GEMINI, CLAUDE</strong></p>
+        <p class="credits-small">Все события и персонажи вымышлены.<br/>Игра создана в учебных целях.</p>
+      </div>
+      <div class="credits-buttons">
+        <button id="btn-credits-replay" class="btn btn--danger">ИГРАТЬ ЗАНОВО</button>
+        <button id="btn-credits-noclip" class="btn btn--light">НОУКЛИП</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Экран-подсказка ноуклипа (показывается поверх HUD) ── -->
+  <div id="noclip-screen" class="hidden">
+    <div class="noclip-banner">
+      <span>РЕЖИМ НОУКЛИП — вы теперь бобр</span>
+    </div>
+  </div>
+
+  <!-- ── Полностью белая вспышка скримера (отдельно от flash-screen,
+       т.к. flash-screen на 220мс и завязан на кнопку «Осознание») ── -->
+  <div id="mirror-scare-flash" aria-hidden="true"></div>
+
+  <!-- ── Секретная концовка «Зеркало»: экран после психушки ── -->
+  <div id="mirror-ending-screen" class="hidden">
+    <div class="credits-inner">
+      <h2 class="credits-title">ТЫ ВОШЁЛ В ЗЕРКАЛО</h2>
+      <div class="credits-body">
+        <p>Комната была мягкой. Дверей не было. Может, их и не должно было быть.</p>
+        <p>Разработка: <strong>UDNMPA TEAM,GEMINI, CLAUDE</strong></p>
+        <p class="credits-small">Все события и персонажи вымышлены.<br/>Игра создана в учебных целях.</p>
+      </div>
+      <div class="credits-buttons">
+        <button id="btn-mirror-ending-replay" class="btn btn--danger">ИГРАТЬ ЗАНОВО</button>
+        <button id="btn-mirror-ending-noclip" class="btn btn--light">НОУКЛИП</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Скрипты ── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/anomalies.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
